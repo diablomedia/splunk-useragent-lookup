@@ -17,7 +17,7 @@ Download Composer: https://getcomposer.org/download/
 
 Install dependencies with composer:
 
-`composer.phar install --no-dev`
+`./composer.phar install --no-dev`
 
 Restart Splunk
 
@@ -136,3 +136,13 @@ There are a few files in the `tests` directory that can be used to test that the
 `cat tests/test3.stdin | ./bin/piwik_lookup http_user_agent ua_browser ua_browser_type ua_version ua_majorver ua_minorver ua_platform ua_platform_version ua_ismobiledevice ua_device_name ua_device_maker ua_device_type ua_fromcache`
 
 Just replace the `test3.stdin` with the file you want to test against (or create your own file, they're just a list of UserAgents, 1 per line).  This should simulate how Splunk sends commands to these lookups.
+
+## Updating Data Files
+
+The Crossjoin Browscap parser automatically updates its data files when a new version of Browscap's INI file is released.  This will happen automatically if you send enough lookups to the parser (The check for a new version is probability based, and defaults to 1% of requests. We've configured this to only happen on 1% of the calls to the lookup script, and not on individual UA lookups, which should reduce its frequency). If you'd like to update manually, just remove the files stored in `data/browscap` and trigger a lookup for this parser (either using one of the test commands above, or by triggering a search in splunk). This will force the library to pull down the latest Browscap file and build its cache.
+
+For the piwik parser, a new version needs to be installed via composer. This can be done using this command (in the root of the app's directory):
+
+`./composer.phar update piwik/device-detector`
+
+If there is a new version of the parser available (with accompanying data files), it will be installed and used in any subsequent lookups (any cache entries using the previous version will not be used any longer, but will not be deleted).

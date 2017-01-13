@@ -39,8 +39,15 @@ Browscap::setFormatter(new BrowscapFormatter());
 
 $bc = new Browscap();
 
+// This call to getBrowser is to trigger the auto-update check for a new version (1% of calls to this script)
+$bc->getBrowser('Test');
+
 // Using the versions of Crossjoin and the Browscap.ini to invalidate the cache if either are updated
 $keyPrefix = 'browscap_' . Browscap::getParser()->getVersion() . '_' . Browscap::VERSION . '_';
+
+// Now we disable the auto-updating so the check for a new version doesn't happen when parsing user-agents
+// where 1% would probably be encountered more often
+Browscap::setUpdater(new Crossjoin\Browscap\Updater\None());
 
 fputcsv(STDOUT, $headers);
 
