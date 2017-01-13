@@ -68,7 +68,7 @@ foreach ($agents as $agent) {
             'ua_device_name'      => $dd->getModel(),
             'ua_device_maker'     => $dd->getBrandName(),
             'ua_device_type'      => $dd->getDeviceName(),
-            'ua_ismobiledevice'   => $dd->isMobile(),
+            'ua_ismobiledevice'   => $dd->isMobile() ? 'true' : 'false',
         ];
 
         $row = [];

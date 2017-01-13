@@ -117,7 +117,7 @@ These are the fields returned by this parser:
  * ua_minorver - Just the Minor Version of the browser
  * ua_platform - Platform/OS (IOS, Android, etc...)
  * ua_platform_version - Version of the Platform
- * ua_ismobiledevice - 1 if the device is a mobile device, 0 if it is not
+ * ua_ismobiledevice - "true" if the device is a mobile device, "false" if it is not
  * ua_device_name - Name of the Device
  * ua_device_maker - Manufacturer of the Device
  * ua_device_type - Type of device (desktop, smartphone, tablet)
