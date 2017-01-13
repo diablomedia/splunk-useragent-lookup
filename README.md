@@ -1,9 +1,9 @@
-= Parsed UserAgent Lookup for Splunk
+# Parsed UserAgent Lookup for Splunk
 
 This lookup will parse a given UserAgent string (as `http_user_agent`) and return `ua_*` properties as splunk fields
 after parsing the UserAgent string.
 
-== Installation
+## Installation
 
 This lookup uses PHP, so the system that the lookup is run on needs to have PHP installed.
 
@@ -21,7 +21,7 @@ Install dependencies with composer:
 
 Restart Splunk
 
-== Configuration
+## Configuration
 
 Once installed, the provided lookups should function just fine, but there will be no caching configured.  If you want to speed up the lookups, you can configure a cache.
 
@@ -29,11 +29,11 @@ In the `config` folder there is a `cache.php.dist` file, copy this file to `cach
 
 We recommend configuring a cache if a lot of UserAgents will be parsed with this lookup.
 
-== Parsers
+## Parsers
 
 These are the parsers included with this lookup (each parser has a different lookup command).
 
-=== Browscap (using Crossjoin 1.x), `ua_browscap_lookup`
+### Browscap (using Crossjoin 1.x), `ua_browscap_lookup`
 
 From our testing, the fastest PHP based UserAgent parser that uses Browscap data files is version 1.x of the Crossjoin parser (https://github.com/crossjoin/Browscap), so we've decided to use this parser in this project.  The lookup command for this parser is `browscap_lookup`.
 
@@ -93,7 +93,7 @@ These are the fields returned by this lookup (These fields are named the same wa
  * ua_renderingengine_maker
  * ua_fromcache
 
-=== Piwik Device Detector, `ua_piwik_lookup`
+### Piwik Device Detector, `ua_piwik_lookup`
 
 This parser is really good at parsing Mobile Devices (better than Browscap currently), which is why it's included here.
 
@@ -113,15 +113,15 @@ These are the fields returned by this parser:
  * ua_device_type - Type of device (desktop, smartphone, tablet)
  * ua_fromcache - "true" if the response came from the cache, "false" if not
 
-== Testing
+## Testing
 
 There are a few files in the `tests` directory that can be used to test that the lookups are working properly, you can issue the following commands to test the lookups:
 
-=== browscap_lookup
+### browscap_lookup
 
 `cat tests/test3.stdin | ./bin/browscap_lookup http_user_agent ua_propertyname ua_masterparent ua_litemode ua_parent ua_comment ua_browser ua_browser_type ua_browser_bits ua_browser_maker ua_browser_modus ua_version ua_majorver ua_minorver ua_platform ua_platform_version ua_platform_description ua_platform_bits ua_platform_maker ua_alpha ua_beta ua_win16 ua_win32 ua_win64 ua_frames ua_iframes ua_tables ua_cookies ua_backgroundsounds ua_javascript ua_vbscript ua_javaapplets ua_activexcontrols ua_ismobiledevice ua_istablet ua_issyndicationreader ua_crawler ua_isfake ua_isanonymized ua_ismodified ua_cssversion ua_aolversion ua_device_name ua_device_maker ua_device_type ua_device_pointing_method ua_device_code_name ua_device_brand_name ua_renderingengine_name ua_renderingengine_version ua_renderingengine_description ua_renderingengine_maker ua_fromcache`
 
-=== piwik_lookup
+### piwik_lookup
 
 `cat tests/test3.stdin | ./bin/piwik_lookup http_user_agent ua_browser ua_browser_type ua_version ua_majorver ua_minorver ua_platform ua_platform_version ua_ismobiledevice ua_device_name ua_device_maker ua_device_type ua_fromcache`
 
