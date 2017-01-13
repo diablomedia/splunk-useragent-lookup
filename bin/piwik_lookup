@@ -73,7 +73,7 @@ foreach ($agents as $agent) {
 
         $row = [];
         foreach ($headers as $header) {
-            $row[$header] = $result[$header];
+            $row[array_search($header, $headers)] = isset($result[$header]) ? $result[$header] : '';
         }
 
         if (isset($cache)) {
