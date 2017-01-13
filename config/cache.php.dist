@@ -1,0 +1,22 @@
+<?php
+
+// Make a copy of this file with your own settings and copy to ./cache.php to enable caching in the lookups
+
+// Setup and configure an instance of a Doctrine cache object
+// PhpFileCache
+$cache = new Doctrine\Common\Cache\PhpFileCache(__DIR__ . '/../data/cache');
+
+// Memcache
+//$memcache = new Memcache();
+//$memcache->connect('localhost', 11211);
+//$cache = new Doctrine\Common\Cache\MemcacheCache();
+//$cache->setMemcache($memcache);
+
+// Any of the cache adapters available in the Doctrine Common Cache project should work
+// https://github.com/doctrine/cache
+
+// Configure cache lifetime (how long should entries be cached, in seconds)
+// This only applies to the user-agent caching implemented in the lookup scripts
+// If a specific parser uses this cache, it may not obey this lifetime value
+// Set this to 0, or don't set it at all for non-expiring cache
+//$cacheLifetime = 86400; // 1 day

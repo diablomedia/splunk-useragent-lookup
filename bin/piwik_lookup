@@ -1,0 +1,91 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+if (file_exists(__DIR__ . '/../config/cache.php')) {
+    include_once __DIR__ . '/../config/cache.php';
+}
+
+use DeviceDetector\DeviceDetector;
+use DeviceDetector\Parser\Device\DeviceParserAbstract;
+
+stream_set_blocking(STDIN, false);
+stream_set_blocking(STDOUT, false);
+
+$i       = 0;
+$headers = [];
+$agents  = [];
+
+if (isset($argv[1])) {
+    array_shift($argv);
+    $headers = $argv;
+}
+
+while ($row = fgetcsv(STDIN)) {
+    if ($i === 0 && empty($headers)) {
+        $headers = $row;
+    } else {
+        $agents[] = $row[0];
+    }
+
+    $i++;
+}
+
+$dd = new DeviceDetector('');
+$dd->skipBotDetection();
+
+// This value is set in the cache.php config file included above
+if (isset($cache)) {
+    $dd->setCache($cache);
+}
+
+$keyPrefix = 'piwik_' . DeviceDetector::VERSION . '_';
+
+fputcsv(STDOUT, $headers);
+
+foreach ($agents as $agent) {
+    $cacheId = $keyPrefix . sha1($agent);
+    if (isset($cache) && $cache->contains($cacheId)) {
+        $row       = $cache->fetch($cacheId);
+        $fromCache = true;
+    } else {
+        $dd->setUserAgent($agent);
+        $dd->parse();
+
+        $clientInfo = $dd->getClient();
+        $osInfo     = $dd->getOs();
+
+        $result = [
+            'http_user_agent'     => $agent,
+            'ua_browser'          => $clientInfo['name'],
+            'ua_browser_type'     => $clientInfo['type'],
+            'ua_version'          => $clientInfo['version'],
+            'ua_majorver'         => explode('.', $clientInfo['version'])[0],
+            'ua_minorver'         => explode('.', $clientInfo['version'])[1],
+            'ua_platform'         => $osInfo['name'],
+            'ua_platform_version' => $osInfo['version'],
+            'ua_device_name'      => $dd->getModel(),
+            'ua_device_maker'     => $dd->getBrandName(),
+            'ua_device_type'      => $dd->getDeviceName(),
+            'ua_ismobiledevice'   => $dd->isMobile(),
+        ];
+
+        $row = [];
+        foreach ($headers as $header) {
+            $row[$header] = $result[$header];
+        }
+
+        if (isset($cache)) {
+            $cache->save($cacheId, $row, isset($cacheLifetime) ? $cacheLifetime : 0);
+        }
+
+        $fromCache = false;
+    }
+
+    if (array_search('ua_fromcache', $headers) !== false) {
+        $row[array_search('ua_fromcache', $headers)] = $fromCache ? 'true' : 'false';
+    }
+
+    fputcsv(STDOUT, $row);
+}

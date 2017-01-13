@@ -1,0 +1,74 @@
+#!/usr/bin/env php
+<?php
+
+require_once __DIR__ . '/../vendor/autoload.php';
+
+if (file_exists(__DIR__ . '/../config/cache.php')) {
+    include_once __DIR__ . '/../config/cache.php';
+}
+
+use Crossjoin\Browscap\Browscap;
+use Crossjoin\Browscap\Cache\File as BrowscapCache;
+use Diablomedia\Splunk\Browscap\Crossjoin\Formatter as BrowscapFormatter;
+
+stream_set_blocking(STDIN, false);
+stream_set_blocking(STDOUT, false);
+
+$i       = 0;
+$headers = [];
+$agents  = [];
+
+if (isset($argv[1])) {
+    array_shift($argv);
+    $headers = $argv;
+}
+
+while ($row = fgetcsv(STDIN)) {
+    if ($i === 0 && empty($headers)) {
+        $headers = $row;
+    } else {
+        $agents[] = $row[0];
+    }
+
+    $i++;
+}
+
+BrowscapCache::setCacheDirectory(__DIR__ . '/../data/browscap');
+Browscap::setDatasetType(Browscap::DATASET_TYPE_LARGE);
+Browscap::setFormatter(new BrowscapFormatter());
+
+$bc = new Browscap();
+
+// Using the versions of Crossjoin and the Browscap.ini to invalidate the cache if either are updated
+$keyPrefix = 'browscap_' . Browscap::getParser()->getVersion() . '_' . Browscap::VERSION . '_';
+
+fputcsv(STDOUT, $headers);
+
+foreach ($agents as $agent) {
+    // Try the cache first
+    $cacheId = $keyPrefix . sha1($agent);
+    if (isset($cache) && $cache->contains($cacheId)) {
+        $row       = $cache->fetch($cacheId);
+        $fromCache = true;
+    } else {
+        $browser                  = $bc->getBrowser($agent)->getData();
+        $browser->http_user_agent = $agent;
+
+        $row = [];
+        foreach ($headers as $header) {
+            $row[array_search($header, $headers)] = isset($browser->$header) ? $browser->$header : '';
+        }
+
+        if (isset($cache)) {
+            $cache->save($cacheId, $row, isset($cacheLifetime) ? $cacheLifetime : 0);
+        }
+
+        $fromCache = false;
+    }
+
+    if (array_search('ua_fromcache', $headers) !== false) {
+        $row[array_search('ua_fromcache', $headers)] = $fromCache ? 'true' : 'false';
+    }
+
+    fputcsv(STDOUT, $row);
+}

@@ -1,0 +1,22 @@
+{
+    "name": "diablomedia/splunk-browscap-crossjoin",
+    "authors": [
+        {
+            "name": "Jay Klehr",
+            "email": "jay@diablomedia.com"
+        }
+    ],
+    "require": {
+        "crossjoin/browscap": "1.0.6",
+        "piwik/device-detector": "~3.0",
+        "doctrine/cache": "^1.6"
+    },
+    "autoload": {
+        "psr-4": {
+            "Diablomedia\\Splunk\\": "src/Diablomedia/Splunk"
+        }
+    },
+    "require-dev": {
+        "friendsofphp/php-cs-fixer": "^2.0"
+    }
+}
