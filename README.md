@@ -29,6 +29,16 @@ In the `config` folder there is a `cache.php.dist` file, copy this file to `cach
 
 We recommend configuring a cache if a lot of UserAgents will be parsed with this lookup.
 
+## Usage
+
+Here's an example splunk search that would use the `ua_browscap_lookup` lookup (this assumes that the UserAgent strings that you want to parse are in the `useragent` field):
+
+> index=web sourcetype=apache_access | lookup ua_browscap_lookup http_user_agent as useragent
+
+This will make the `ua_*` fields listed below available, which you could use to filter the results, for example:
+
+> index=web sourcetype=apache_access | lookup ua_browscap_lookup http_user_agent as useragent | search ua_platform=Android
+
 ## Parsers
 
 These are the parsers included with this lookup (each parser has a different lookup command).
