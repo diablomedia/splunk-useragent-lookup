@@ -46,6 +46,7 @@ fputcsv(STDOUT, $headers);
 
 foreach ($agents as $agent) {
     $cacheId = $keyPrefix . sha1($agent);
+    $start = microtime(true);
     if (isset($cache) && $cache->contains($cacheId)) {
         $row       = $cache->fetch($cacheId);
         $fromCache = true;
@@ -82,9 +83,15 @@ foreach ($agents as $agent) {
 
         $fromCache = false;
     }
+    $end = microtime(true) - $start;
 
     if (array_search('ua_fromcache', $headers) !== false) {
         $row[array_search('ua_fromcache', $headers)] = $fromCache ? 'true' : 'false';
+    }
+
+    // Add timing info if passed
+    if (array_search('ua_timetaken', $headers) !== false) {
+        $row[array_search('ua_timetaken', $headers)] = $end;
     }
 
     fputcsv(STDOUT, $row);

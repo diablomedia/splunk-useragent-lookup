@@ -45,11 +45,11 @@ These are the parsers included with this lookup (each parser has a different loo
 
 ### Browscap (using Crossjoin 1.x), `ua_browscap_lookup`
 
-From our testing, the fastest PHP based UserAgent parser that uses Browscap data files is version 1.x of the Crossjoin parser (https://github.com/crossjoin/Browscap), so we've decided to use this parser in this project.  The lookup command for this parser is `browscap_lookup`.
+From our testing, the fastest PHP based UserAgent parser that uses Browscap data files is version 1.x of the Crossjoin parser (https://github.com/crossjoin/Browscap), so we've decided to use this parser in this project.
 
 Note that the very first lookup using this library will take a little bit of time as the most up-to-date Browscap file is downloaded and parsed. Subsequent requests should return much faster.
 
-These are the fields returned by this lookup (These fields are named the same way as they are in the Browscap project's data files, so please reference them for what the properties are, and what the values represent.  The only exceptions are `http_user_agent` (UserAgent string passed by splunk) and `ua_fromcache` (true or false if the value was retrieved from the cache):
+These are the fields returned by this lookup (These fields are named the same way as they are in the Browscap project's data files, so please reference them for what the properties are, and what the values represent.  The only exceptions are `http_user_agent` (UserAgent string passed by splunk) and `ua_fromcache` (true or false if the value was retrieved from the cache)):
 
  * http_user_agent
  * ua_propertyname
@@ -146,3 +146,7 @@ For the piwik parser, a new version needs to be installed via composer. This can
 `./composer.phar update piwik/device-detector`
 
 If there is a new version of the parser available (with accompanying data files), it will be installed and used in any subsequent lookups (any cache entries using the previous version will not be used any longer, but will not be deleted).
+
+## Benchmarking
+
+This isn't enabled by default, but if you would like to see the time taken for the UserAgent lookups you can pass an extra column/field in the lookup command/available fields (this requires modifying the lookup command inside splunk's settings, or modifying the `transforms.conf` file in the `default` folder and restarting splunk). If you add `ua_timetaken` to the lookup command and as an available field, this field will be passed back to splunk which you can use to evaluate the parser or your caching strategy, etc...
