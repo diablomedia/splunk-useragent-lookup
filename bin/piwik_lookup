@@ -46,10 +46,10 @@ fputcsv(STDOUT, $headers);
 
 foreach ($agents as $agent) {
     $cacheId = $keyPrefix . sha1($agent);
-    $start = microtime(true);
+    $start   = microtime(true);
     if (isset($cache) && $cache->contains($cacheId)) {
-        $row       = $cache->fetch($cacheId);
-        $fromCache = true;
+        $result       = $cache->fetch($cacheId);
+        $fromCache    = true;
     } else {
         $dd->setUserAgent($agent);
         $dd->parse();
@@ -72,18 +72,18 @@ foreach ($agents as $agent) {
             'ua_ismobiledevice'   => $dd->isMobile() ? 'true' : 'false',
         ];
 
-        $row = [];
-        foreach ($headers as $header) {
-            $row[array_search($header, $headers)] = isset($result[$header]) ? $result[$header] : '';
-        }
-
         if (isset($cache)) {
-            $cache->save($cacheId, $row, isset($cacheLifetime) ? $cacheLifetime : 0);
+            $cache->save($cacheId, $result, isset($cacheLifetime) ? $cacheLifetime : 0);
         }
 
         $fromCache = false;
     }
     $end = microtime(true) - $start;
+
+    $row = [];
+    foreach ($headers as $header) {
+        $row[array_search($header, $headers)] = isset($result[$header]) ? $result[$header] : '';
+    }
 
     if (array_search('ua_fromcache', $headers) !== false) {
         $row[array_search('ua_fromcache', $headers)] = $fromCache ? 'true' : 'false';

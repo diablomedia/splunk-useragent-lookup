@@ -9,7 +9,7 @@ class Formatter extends AbstractFormatter
 {
     public function __construct()
     {
-        $this->settings = new stdClass();
+        $this->settings = [];
     }
 
     /**
@@ -19,26 +19,26 @@ class Formatter extends AbstractFormatter
      */
     public function setData(array $settings)
     {
-        $this->settings = new stdClass();
+        $this->settings = [];
         foreach ($settings as $key => $value) {
             $key = 'ua_' . strtolower($key);
-            $this->settings->$key = $value;
+            $this->settings[$key] = $value;
         }
 
-        $this->settings->ua_litemode = 'false';
+        $this->settings['ua_litemode'] = 'false';
 
-        if (!isset($this->settings->ua_masterparent)) {
-            $this->settings->ua_masterparent = 'false';
+        if (!isset($this->settings['ua_masterparent'])) {
+            $this->settings['ua_masterparent'] = 'false';
         }
 
-        $this->settings->ua_propertyname = $this->settings->ua_browser_name_pattern;
-        unset($this->settings->ua_browser_name_pattern);
+        $this->settings['ua_propertyname'] = $this->settings['ua_browser_name_pattern'];
+        unset($this->settings['ua_browser_name_pattern']);
     }
 
     /**
      * Gets the data (in the preferred format).
      *
-     * @return \stdClass
+     * @return array
      */
     public function getData()
     {

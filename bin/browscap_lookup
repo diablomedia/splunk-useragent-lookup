@@ -54,26 +54,26 @@ fputcsv(STDOUT, $headers);
 foreach ($agents as $agent) {
     // Try the cache first
     $cacheId = $keyPrefix . sha1($agent);
-    $start = microtime(true);
+    $start   = microtime(true);
     if (isset($cache) && $cache->contains($cacheId)) {
-        $row       = $cache->fetch($cacheId);
-        $fromCache = true;
+        $browser       = $cache->fetch($cacheId);
+        $fromCache     = true;
     } else {
-        $browser                  = $bc->getBrowser($agent)->getData();
-        $browser->http_user_agent = $agent;
-
-        $row = [];
-        foreach ($headers as $header) {
-            $row[array_search($header, $headers)] = isset($browser->$header) ? $browser->$header : '';
-        }
+        $browser                    = $bc->getBrowser($agent)->getData();
+        $browser['http_user_agent'] = $agent;
 
         if (isset($cache)) {
-            $cache->save($cacheId, $row, isset($cacheLifetime) ? $cacheLifetime : 0);
+            $cache->save($cacheId, $browser, isset($cacheLifetime) ? $cacheLifetime : 0);
         }
 
         $fromCache = false;
     }
     $end = microtime(true) - $start;
+
+    $row = [];
+    foreach ($headers as $header) {
+        $row[array_search($header, $headers)] = isset($browser[$header]) ? $browser[$header] : '';
+    }
 
     if (array_search('ua_fromcache', $headers) !== false) {
         $row[array_search('ua_fromcache', $headers)] = $fromCache ? 'true' : 'false';
